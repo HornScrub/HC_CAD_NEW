@@ -203,3 +203,10 @@ if "runserver" in sys.argv and os.environ.get("RUN_MAIN") == "true":
     print(f"Active Database: {DATABASES['default']['NAME']}")
     print(f"USE_TEST_DB: {USE_TEST_DB}")
     print(f"DJANGO_TEST_MODE: {os.getenv('DJANGO_TEST_MODE', 'Not Set')}")
+
+# Import local settings if they exist
+try:
+    from .settings_local import *
+except ImportError:
+    pass  # If no local settings, continue normally
+
