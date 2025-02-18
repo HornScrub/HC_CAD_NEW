@@ -46,10 +46,10 @@ class DispatcherLoadTest(HttpUser):
             "call_sid": call_sid,
             "caller_number": "+1" + "".join(random.choices(string.digits, k=10)),
             "location": random.choice(["100 Main St", "500 Elm St", "200 Broadway"]),
-            "emergency_type": random.choice(["POLICE", "MEDICAL", "FIRE"]),
+            "emergency_type": random.choice(["POLICE", "MEDICAL"]),  # Removed "FIRE"
             "incident_number": incident_number,  
-            "priority_level": random.choice(["LOW", "MEDIUM", "HIGH", "CRITICAL"]),
-            "status": random.choice(["ACTIVE", "IN_PROGRESS", "COMPLETED"])
+            "priority_level": random.choice(["STANDARD", "MEDIUM", "HIGH"]),  # Fixed priority levels
+            "status": random.choice(["PENDING", "ACTIVE", "DISPATCHED", "ESCALATED", "COMPLETED", "CANCELLED"])  # Fixed statuses
         }, headers=headers)
 
         if response.status_code == 201:
@@ -65,9 +65,10 @@ class DispatcherLoadTest(HttpUser):
         call_sid = random.choice(self.created_calls)  
 
         response = self.client.post(f"/api/calls/{call_sid}/interactions/", json={
-            "speaker": "SYSTEM",
+            "speaker": "DISPATCHER",
             "message": "Emergency responders are en route."
         }, headers=headers)
 
         if response.status_code != 201:
             print(f"Log Interaction Failed [{response.status_code}]: {response.text}")
+

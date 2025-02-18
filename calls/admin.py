@@ -10,7 +10,7 @@ def export_calls_csv(modeladmin, request, queryset):
     writer = csv.writer(response)
 
     # Write CSV headers
-    writer.writerow(["Incident Number", "Caller Number", "Emergency Type", "Status", "Priority Level", "Created At", "Completed At"])
+    writer.writerow(["Incident Number", "Caller Number", "Emergency Type", "Status", "Priority Level", "Timestamp", "Completed At"])
 
     # Write row data
     for call in queryset:
@@ -20,7 +20,7 @@ def export_calls_csv(modeladmin, request, queryset):
             call.emergency_type,
             call.status,
             call.priority_level,
-            call.created_at,
+            call.timestamp,  # FIX: Changed from created_at to timestamp
             call.completed_at if call.completed_at else "N/A"
         ])
     
@@ -30,7 +30,7 @@ export_calls_csv.short_description = "Export Selected Calls as CSV"
 
 @admin.register(Call)
 class CallAdmin(admin.ModelAdmin):
-    list_display = ("incident_number", "caller_number", "emergency_type", "status", "priority_level", "created_at")
+    list_display = ("incident_number", "caller_number", "emergency_type", "status", "priority_level", "timestamp")  # FIX
     list_filter = ("status", "emergency_type", "priority_level")
     search_fields = ("incident_number", "caller_number")
     
@@ -42,5 +42,4 @@ class CallAdmin(admin.ModelAdmin):
 @admin.register(CallInteraction)
 class CallInteractionAdmin(admin.ModelAdmin):
     list_display = ("call", "speaker", "timestamp")
-    search_fields = ("call__incident_number", "message")
-
+    search_fields = ("call__incident_number", "text")  # FIX: Changed "message" to "text"

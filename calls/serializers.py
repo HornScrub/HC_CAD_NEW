@@ -4,7 +4,7 @@ from .models import Call, CallInteraction
 class CallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Call
-        fields = '__all__'  # Include all model fields
+        fields = '__all__'
 
 class CallInteractionSerializer(serializers.ModelSerializer):
     class Meta:
