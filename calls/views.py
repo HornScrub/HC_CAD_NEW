@@ -70,12 +70,12 @@ class CallUpdateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # ✅ Log a conversation interaction
-class CallInteractionCreateView(generics.CreateAPIView):
-    serializer_class = CallInteractionSerializer
+class CallInteractionCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, call_sid):
+        """Create a new call interaction"""
         call = get_object_or_404(Call, call_sid=call_sid)
         data = request.data.copy()
         data["call"] = call.id
@@ -84,3 +84,24 @@ class CallInteractionCreateView(generics.CreateAPIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, interaction_id):
+        """Update an existing interaction (e.g., add message later)"""
+        interaction = get_object_or_404(CallInteraction, id=interaction_id)
+        serializer = CallInteractionSerializer(interaction, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CallInteractionListView(generics.ListAPIView):
+    queryset = CallInteraction.objects.all().order_by("-timestamp")
+    serializer_class = CallInteractionSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ["call", "speaker"]
+    search_fields = ["message"]
+    ordering_fields = ["timestamp"]
+    pagination_class = StandardResultsSetPagination

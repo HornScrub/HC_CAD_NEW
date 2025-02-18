@@ -1,18 +1,18 @@
 from django.db import models
 
-from django.db import models
-
 class Call(models.Model):
     call_sid = models.CharField(max_length=100, unique=True)  # Twilio Call ID
     caller_number = models.CharField(max_length=20)
-    category = models.CharField(max_length=50, default="GENERAL")
-    location = models.TextField()
+    category = models.CharField(max_length=50, default="GENERAL", blank=True, null=True)
+    location = models.TextField(blank=True, null=True)
     emergency_type = models.CharField(
-        max_length=50, choices=[("POLICE", "Police"), ("MEDICAL", "Medical")]
+        max_length=50, choices=[("POLICE", "Police"), ("MEDICAL", "Medical")],
+        blank=True, null=True
     )
-    incident_number = models.CharField(max_length=50, unique=True)
+    incident_number = models.CharField(max_length=50, unique=True, blank=True, null=True)
     priority_level = models.CharField(
-        max_length=20, choices=[("STANDARD", "Standard"), ("MEDIUM", "Medium"), ("HIGH", "High")]
+        max_length=20, choices=[("STANDARD", "Standard"), ("MEDIUM", "Medium"), ("HIGH", "High")],
+        blank=True, null=True
     )
     
     STATUS_CHOICES = [
@@ -23,6 +23,7 @@ class Call(models.Model):
         ("COMPLETED", "Completed"),
         ("CANCELLED", "Cancelled"),
     ]
+
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
 
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -47,15 +48,16 @@ class Call(models.Model):
 
 class CallInteraction(models.Model):
     call = models.ForeignKey(Call, on_delete=models.CASCADE, related_name="interactions")
-    
+
     SPEAKER_CHOICES = [("CALLER", "Caller"), ("DISPATCHER", "Dispatcher")]
     speaker = models.CharField(max_length=20, choices=SPEAKER_CHOICES)
-    
-    message = models.TextField()  # Rename back to message for consistency
+
+    message = models.TextField(blank=True, null=True)  # ✅ Allow updates later
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.speaker}: {self.message[:50]}"  # Show first 50 chars
+        return f"{self.speaker}: {self.message[:50]}" if self.message else f"{self.speaker}: (No message yet)"
+
 
 
 
