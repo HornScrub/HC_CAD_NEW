@@ -14,34 +14,7 @@ SECRET_KEY = 'django-insecure-il6+ea&xi3so4$wn^w=fozg0pd(c=y^t6$v^y+56xk!v7x-=v@
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG= True
-''' TEST ENV CONFIGS
-DEBUG = FALSE
 
-ALLOWED_HOSTS = [] <- patriotmbt.com here
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
-    },
-    "persistent_test": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("TEST_DB_NAME"),
-        "USER": os.getenv("TEST_DB_USER"),
-        "PASSWORD": os.getenv("TEST_DB_PASSWORD"),
-        "HOST": os.getenv("TEST_DB_HOST"),
-        "PORT": os.getenv("TEST_DB_PORT"),
-    }
-
-    STATIC_ROOT = BASE_DIR / "staticfiles"
-    MEDIA_ROOT = BASE_DIR / "media"
-
-}
-'''
 ALLOWED_HOSTS = []
 
 # Application definition
@@ -144,12 +117,18 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+USE_JWT = os.getenv("USE_JWT", "True") == "True"
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',  # Use JWT auth
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ) if USE_JWT else (
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',  # Require authentication by default
+        'rest_framework.permissions.IsAuthenticated',
+    ) if USE_JWT else (
+        'rest_framework.permissions.AllowAny',
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,  # Adjust this number as needed
@@ -202,6 +181,7 @@ if "runserver" in sys.argv and os.environ.get("RUN_MAIN") == "true":
     print(f"⚠️ Switching to Test Database ⚠️" if USE_TEST_DB else "Using Primary Database")
     print(f"Active Database: {DATABASES['default']['NAME']}")
     print(f"USE_TEST_DB: {USE_TEST_DB}")
+    print(f"USE JWT: {USE_JWT}")
     print(f"DJANGO_TEST_MODE: {os.getenv('DJANGO_TEST_MODE', 'Not Set')}")
 
 # Import local settings if they exist
