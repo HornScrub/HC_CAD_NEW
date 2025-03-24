@@ -1,15 +1,26 @@
 from rest_framework import viewsets, generics, status, filters
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from rest_framework.pagination import PageNumberPagination
 from .models import Call, CallInteraction
 from .serializers import CallSerializer, CallInteractionSerializer
 from .filters import CallFilter  # Import the new filter
+
+# Determine the default authentication and permission classes based on settings
+
+if settings.USE_JWT:
+    DEFAULT_AUTH = [JWTAuthentication]
+    DEFAULT_PERM = [IsAuthenticated]
+else:
+    DEFAULT_AUTH = [SessionAuthentication]
+    DEFAULT_PERM = [AllowAny]
 
 # ✅ Pagination for CallListView
 class StandardResultsSetPagination(PageNumberPagination):
@@ -21,8 +32,8 @@ class StandardResultsSetPagination(PageNumberPagination):
 class CallListView(generics.ListAPIView):
     queryset = Call.objects.all().order_by("-timestamp")
     serializer_class = CallSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = DEFAULT_AUTH
+    permission_classes = DEFAULT_PERM
 
     # Apply custom filtering
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -37,13 +48,13 @@ class CallListView(generics.ListAPIView):
 class CallCreateView(generics.CreateAPIView):
     queryset = Call.objects.all()
     serializer_class = CallSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = DEFAULT_AUTH
+    permission_classes = DEFAULT_PERM
 
 # ✅ Retrieve, update, or partially update a call
 class CallUpdateView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = DEFAULT_AUTH
+    permission_classes = DEFAULT_PERM
 
     # ✅ Retrieve a call
     def get(self, request, call_sid):
@@ -71,8 +82,8 @@ class CallUpdateView(APIView):
 
 # ✅ Log a conversation interaction
 class CallInteractionCreateView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = DEFAULT_AUTH
+    permission_classes = DEFAULT_PERM
 
     def post(self, request, call_sid):
         """Create a new call interaction"""
@@ -97,8 +108,8 @@ class CallInteractionCreateView(APIView):
 class CallInteractionListView(generics.ListAPIView):
     queryset = CallInteraction.objects.all().order_by("-timestamp")
     serializer_class = CallInteractionSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = DEFAULT_AUTH
+    permission_classes = DEFAULT_PERM
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["call", "speaker"]
