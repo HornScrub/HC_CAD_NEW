@@ -1,0 +1,16 @@
+TEN_CODES = {
+    "10-1": "Unable to copy, change location",
+    "10-4": "Acknowledgement (OK)",
+    "10-6": "Busy – Stand by unless urgent",
+    "10-7": "Out of service",
+    "10-8": "In service",
+    "10-9": "Repeat",
+    "10-10": "Negative",
+    "10-20": "Location",
+    "10-23": "Arrived at scene",
+    "10-24": "Assignment completed",
+    "10-33": "Emergency, all units stand by",
+    "10-36": "Correct time",
+    "10-97": "Arrived at scene",
+    "10-98": "Finished with last assignment",
+}

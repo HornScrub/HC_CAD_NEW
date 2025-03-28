@@ -1,9 +1,8 @@
 from django.urls import path
-from .views import CallListView, CallCreateView, CallUpdateView, CallInteractionCreateView
+from .views import CallListCreateView, CallRetrieveUpdateDestroyView, CompleteCallView
 
 urlpatterns = [
-    path("calls/", CallListView.as_view(), name="get_calls"),  # No "/api/" prefix here!
-    path("calls/create/", CallCreateView.as_view(), name="call-create"),
-    path("calls/<str:call_sid>/", CallUpdateView.as_view(), name="call-update"),
-    path("calls/<str:call_sid>/interactions/", CallInteractionCreateView.as_view(), name="call-interaction"),
+    path("", CallListCreateView.as_view(), name="call-list-create"),
+    path("<str:call_sid>/", CallRetrieveUpdateDestroyView.as_view(), name="call-detail"),
+    path("<str:call_sid>/complete/", CompleteCallView.as_view(), name="call-complete"),
 ]

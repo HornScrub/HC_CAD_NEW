@@ -31,8 +31,11 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'drf_yasg', # Yet Another Swagger Generator - Interactive Swagger UI
-    'backend',
     'calls',
+    'units',
+    'records',
+    'incidents',
+    'interactions',
 ]
 
 MIDDLEWARE = [
